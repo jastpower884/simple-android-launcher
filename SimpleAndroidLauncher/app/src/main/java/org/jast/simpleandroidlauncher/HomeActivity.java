@@ -31,10 +31,6 @@ public class HomeActivity extends AppCompatActivity {
      * 要顯示的app
      */
     String[] stayApps = {
-            "com.ptc.cuckoos",
-            "com.android.settings",
-            "com.ptc.sg.post",
-            "ptc.sg.android.app",
 
     };
 
