@@ -1,6 +1,7 @@
 package org.jast.simpleandroidlauncher;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,54 +10,44 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by ptc_02008 on 2016/11/3.
  */
 
 public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    /**
-     * 這是由於 RecyclerView 沒辦法直接使用 onItemClick 去監聽，而直接用 onClick
-     * 監聽又難以取得點擊位置資訊，所以乾脆自訂一個抽象實體，讓外面去監聽比較好處理
-     */
     public interface RecyclerViewClick {
         void onClick(View view, int position);
     }
 
     private final LayoutInflater mLayoutInflater;
     private final Context mContext;
-    private String[] mTitles;
-    private RecyclerViewClick mRecyclerViewClick;
+    private List<AppDetail> apps;
     private int layoutID = 0;
 
 
-    public AppListAdapter(Context context, String[] titles, RecyclerViewClick mRecylclerViewClick) {
-        mTitles = titles;
+    public AppListAdapter(Context context, List<AppDetail> apps) {
+        this.apps = apps;
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
-        this.mRecyclerViewClick = mRecylclerViewClick;
-    }
-
-    public AppListAdapter(Context context, String[] titles, RecyclerViewClick mRecylclerViewClick, int layoutID) {
-        mTitles = titles;
-        mContext = context;
-        mLayoutInflater = LayoutInflater.from(context);
-        this.mRecyclerViewClick = mRecylclerViewClick;
-        this.layoutID = layoutID;
     }
 
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 //        if(layoutID!=0){
-        return new MainViewHolder(mLayoutInflater.inflate(layoutID, parent, false), mRecyclerViewClick);
+//        return new MainViewHolder(mLayoutInflater.inflate(layoutID, parent, false), mRecyclerViewClick);
 //        }
-//        return new MainViewHolder(mLayoutInflater.inflate(R.layout.item_main_button, parent, false), mRecyclerViewClick);
+        return new MainViewHolder(mLayoutInflater.inflate(R.layout.item_app_launcher, parent, false));
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((MainViewHolder) holder).mTextViewTitle.setText(mTitles[position]);
+        ((MainViewHolder) holder).mImageViewAppIcon.setImageDrawable(apps.get(position).getIcon());
+        ((MainViewHolder) holder).mTextViewAppName.setText(apps.get(position).getLabel());
+        ((MainViewHolder) holder).setApp(apps.get(position));
     }
 
     @Override
@@ -66,38 +57,43 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
-        return mTitles == null ? 0 : mTitles.length;
+        return apps == null ? 0 : apps.size();
     }
 
     public static class MainViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout mLinearLayoutMainButton;
-        TextView mTextViewTitle;
-        TextView mTextViewContent;
+        ImageView mImageViewAppIcon;
+        TextView mTextViewAppName;
 
         ImageView mImageView;
 
+        AppDetail app;
 
         RecyclerViewClick mRecyclerViewClick;
 
-        MainViewHolder(View view, RecyclerViewClick mRecyclerViewClick) {
+        MainViewHolder(View view) {
             super(view);
-            this.mRecyclerViewClick = mRecyclerViewClick;
-//            mLinearLayoutMainButton = (LinearLayout) view.findViewById(R.id.ll_main_button);
-//            mTextViewTitle = (TextView) view.findViewById(R.id.tv_title);
-//            mTextViewContent = (TextView) view.findViewById(R.id.tv_content);
-//            mLinearLayoutMainButton.setOnClickListener(mOnClickListener);
-//            mLinearLayoutMainButton.getLayoutParams().height = MainApplication.getInstance().getScreenHeight() / 8;
+//            view.setFocusable(true);
+//            view.setFocusableInTouchMode(true);
+            view.findViewById(R.id.linear_layout).setFocusable(true);
+            view.findViewById(R.id.linear_layout).setFocusableInTouchMode(true);
+            mImageViewAppIcon = (ImageView) view.findViewById(R.id.image_view_app_icon);
+            mTextViewAppName = (TextView) view.findViewById(R.id.text_view_app_name);
+            view.findViewById(R.id.linear_layout).setOnClickListener(mOnClickListener);
         }
 
         // RecyclerView 的監聽者
         View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 這邊會將物件和位置傳入Activity實作的實體中
-                mRecyclerViewClick.onClick(v, getAdapterPosition());
+
+                Intent i = v.getContext().getPackageManager().getLaunchIntentForPackage(app.name.toString());
+                v.getContext().startActivity(i);
             }
         };
+
+        public void setApp(AppDetail app) {
+            this.app = app;
+        }
     }
 }
-
