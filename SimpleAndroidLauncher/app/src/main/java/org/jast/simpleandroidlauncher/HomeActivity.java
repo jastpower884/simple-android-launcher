@@ -1,18 +1,13 @@
 package org.jast.simpleandroidlauncher;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.PixelFormat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.view.WindowManager;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,16 +16,12 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private static final String STATUS_BAR_SERVICE = "statusbar";
-    private static final int DISABLE_NONE = 0x00000000;
-    private static final int STATUS_BAR_DISABLE_EXPAND = 0x00010000;
-
-    RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
 
     /**
-     * 要顯示的app
+     * package name which it need to show.
      */
-    String[] stayApps = {
+    private String[] stayApps = {
 
     };
 
@@ -40,11 +31,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
-//        mStatusBarManager = (StatusBarManager) mContext.getSystemService(Context.STATUS_BAR_SERVICE);
-//        mStatusBarManager.disable(StatusBarManager.DISABLE_EXPAND);
-
-
+        Log.v("+=====+", "onCreate");
 
         loadApps();
     }
@@ -52,7 +39,13 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        disableStatusbarExpand(STATUS_BAR_DISABLE_EXPAND);
+        disableStatusbarExpand();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     private PackageManager manager;
@@ -69,14 +62,14 @@ public class HomeActivity extends AppCompatActivity {
         for (ResolveInfo ri : availableActivities) {
             AppDetail app = new AppDetail();
             for (String stayApp : stayApps) {
-                if (stayApp.equals(ri.activityInfo.packageName)) {
-                    app.label = ri.loadLabel(manager);
-                    app.name = ri.activityInfo.packageName;
-                    Log.v("+=====+", "app.name:" + app.name);
-                    app.icon = ri.activityInfo.loadIcon(manager);
-                    apps.add(app);
-                    break;
-                }
+//                if (stayApp.equals(ri.activityInfo.packageName)) {
+                app.label = ri.loadLabel(manager);
+                app.name = ri.activityInfo.packageName;
+                Log.v("+=====+", "app.name:" + app.name);
+                app.icon = ri.activityInfo.loadIcon(manager);
+                apps.add(app);
+//                    break;
+//                }
 
             }
         }
@@ -91,17 +84,64 @@ public class HomeActivity extends AppCompatActivity {
 //        super.onBackPressed();
     }
 
-    private void disableStatusbarExpand(int what) {
+    private void disableStatusbarExpand() {
+        Log.v("+=====+", "disable Status bar Expand");
         try {
+            /*
+            * you need system signatures first.
+            * */
             Object service = getSystemService("statusbar");
-            Class<?> statusbarManager = null;
-            statusbarManager = Class.forName("android.app.StatusBarManager");
-            Method collapse = statusbarManager.getMethod("collapse");
-            collapse.setAccessible(true);
-            collapse.invoke(service);
-        } catch (Exception e) {
-            Log.v("+===+", "e:" + e.getMessage());
+            Class<?> statusBarManager = Class.forName("android.app.StatusBarManager");
 
+            Method expand = statusBarManager.getMethod("disable", int.class);
+
+            /*
+            * Reference by View.STATUS_BAR_DISABLE_EXPAND,
+            * because this constant is hide in Android, you can see it, but you can not use it.
+            * So,we need to use the Method invoke way to implement way disable status bar.
+            * */
+            expand.invoke(service, 0x00010000);
+
+            // The is only expand/collapse the status bar not disable, which mean user can still control status bar
+//            Method expand;
+//            if (Build.VERSION.SDK_INT >= 17) {
+//                expand = statusBarManager.getMethod("expandNotificationsPanel");
+//            } else {
+//                expand = statusBarManager.getMethod("expand");
+//            }
+//            expand.invoke(service);
+
+//            Method collapse = null;
+//            if (Build.VERSION.SDK_INT >= 16) {
+//                collapse = statusBarManager.getMethod("collapsePanels");
+//            } else {
+//                collapse = statusBarManager.getMethod("collapse");
+//            }
+//            collapse.setAccessible(true);
+//            collapse.invoke(service);
+
+
+            /*
+            * Please reference :
+            * View.STATUS_BAR_DISABLE_BACK
+            * View.STATUS_BAR_DISABLE_EXPAND
+            * View.STATUS_BAR_DISABLE_NOTIFICATION_ICONS
+            * View.STATUS_BAR_DISABLE_NOTIFICATION_ALERTS
+            * View.STATUS_BAR_DISABLE_NOTIFICATION_TICKER
+            * View.STATUS_BAR_DISABLE_SYSTEM_INFO
+            *
+            * Than you maybe get what you need, I did not try those constants if I invoke it, so I don't know what will happen.
+            * */
+//            statusbarManager.getMethod("disable", int.class).invoke(service, 0x00000001);
+//            expand.invoke(service, 0x00000001);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }
