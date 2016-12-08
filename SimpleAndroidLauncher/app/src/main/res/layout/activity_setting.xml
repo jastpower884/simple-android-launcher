@@ -15,10 +15,57 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_name" />
+        android:text="Brightness" />
 
     <SeekBar
         android:id="@+id/seek_bar_brightness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Ring Volume" />
+
+    <SeekBar
+        android:id="@+id/seek_bar_ring_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Notification Volume" />
+
+    <SeekBar
+        android:id="@+id/seek_bar_notification_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Music Volume" />
+
+    <SeekBar
+        android:id="@+id/seek_bar_music_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="System Volume" />
+
+    <SeekBar
+        android:id="@+id/seek_bar_system_volume"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
