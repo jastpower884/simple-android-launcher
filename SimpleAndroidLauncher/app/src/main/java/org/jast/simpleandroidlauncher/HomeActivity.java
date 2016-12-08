@@ -3,6 +3,7 @@ package org.jast.simpleandroidlauncher;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -55,21 +56,29 @@ public class HomeActivity extends AppCompatActivity {
         manager = getPackageManager();
         apps = new ArrayList<>();
 
+        // add the setting icon
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
+        AppDetail app = new AppDetail();
+        app.label = "Setting";
+        app.name = SettingActivity.class.getName();
+        app.icon = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_settings_applications_black_50dp);
+        app.appType = AppDetail.TYPE_SETTING_APP;
+        apps.add(app);
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for (ResolveInfo ri : availableActivities) {
-            AppDetail app = new AppDetail();
+            app = new AppDetail();
             for (String stayApp : stayApps) {
-//                if (stayApp.equals(ri.activityInfo.packageName)) {
-                app.label = ri.loadLabel(manager);
-                app.name = ri.activityInfo.packageName;
-                Log.v("+=====+", "app.name:" + app.name);
-                app.icon = ri.activityInfo.loadIcon(manager);
-                apps.add(app);
-//                    break;
-//                }
+                if (stayApp.equals(ri.activityInfo.packageName)) {
+                    app.label = ri.loadLabel(manager);
+                    app.name = ri.activityInfo.packageName;
+                    Log.v("+=====+", "app.name:" + app.name);
+                    app.icon = ri.activityInfo.loadIcon(manager);
+                    app.appType = AppDetail.TYPE_OTHER_APP;
+                    apps.add(app);
+                    break;
+                }
 
             }
         }

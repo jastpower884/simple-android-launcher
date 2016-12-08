@@ -7,9 +7,18 @@ import android.graphics.drawable.Drawable;
  */
 
 public class AppDetail {
+
+
+    public static final int TYPE_SETTING_APP = 0x000001;
+    public static final int TYPE_OTHER_APP = 0x000002;
+
+
     CharSequence label;
     CharSequence name;
     Drawable icon;
+
+    int appType;
+
 
     public CharSequence getLabel() {
         return label;
@@ -21,5 +30,10 @@ public class AppDetail {
 
     public Drawable getIcon() {
         return icon;
+    }
+
+
+    public int getAppType() {
+        return appType;
     }
 }

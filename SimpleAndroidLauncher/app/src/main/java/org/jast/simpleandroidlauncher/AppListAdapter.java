@@ -3,6 +3,7 @@ package org.jast.simpleandroidlauncher;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,8 +88,25 @@ public class AppListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             @Override
             public void onClick(View v) {
 
-                Intent i = v.getContext().getPackageManager().getLaunchIntentForPackage(app.name.toString());
-                v.getContext().startActivity(i);
+
+                Log.v("AppLuncher", "app.name:" + app.name);
+
+                switch (app.getAppType()) {
+
+                    case AppDetail.TYPE_OTHER_APP:
+                        Intent i = v.getContext().getPackageManager().getLaunchIntentForPackage(app.name.toString());
+                        v.getContext().startActivity(i);
+                        break;
+                    case AppDetail.TYPE_SETTING_APP:
+                        i = new Intent();
+                        i.setClassName(v.getContext(), app.getName().toString());
+                        v.getContext().startActivity(i);
+
+                        break;
+
+                }
+
+
             }
         };
 
